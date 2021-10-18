@@ -11,5 +11,23 @@ module Flow
       params = input.merge(self.data)
       Flow::Result(typeof(params)).new(self.is_success, params, self.result_type)
     end
+
+    def failure?
+      !@is_success
+    end
+
+    def success?
+      @is_success
+    end
+
+    def then(step : Flow::Step.class, params : U) : (Flow::Result) forall U
+      return self if self.failure?
+      step.call(merge_data(params))
+    end
+
+    def then(step : Flow::Step.class) : (Flow::Result) forall U
+      return self if self.failure?
+      self.then(step, {} of String => String)
+    end
   end
 end

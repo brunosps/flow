@@ -18,6 +18,19 @@ describe Flow::Result do
     end
   end
 
+  describe "#then" do
+    it "with merges data" do
+      result = StepSuccess.call(input).then(StepValidator, {"user" => "bruno"})
+      result.data["user"].should eq("bruno")
+    end
+
+    it "with no merges data" do
+      result = StepSuccess.call(input).then(StepValidator)
+      result.data.has_key?("one").should be_true
+      result.data.has_key?("user").should be_false
+    end
+  end
+
   it "#merge_data" do
     extra = {"extra" => "extra"}
 
@@ -28,5 +41,15 @@ describe Flow::Result do
     result.result_type.should eq("ok")
     result.data.has_key?("extra").should be_true
     result.data.size.should eq(3)
+  end
+
+  it "failure?" do
+    result = Flow::Result.new(false, input, "ok")
+    result.failure?.should be_true
+  end
+
+  it "success?" do
+    result = Flow::Result.new(true, input, "ok")
+    result.success?.should be_true
   end
 end

@@ -2,6 +2,8 @@ require "./error_list"
 
 module Flow::Prop
   class Validator(U)
+    DEFAULT_PARAMS = {required: false, max_length: 0, min_length: 0, size: 0, max_value: 0, min_value: 0, inclusion: [] of Hash(String, String), exclusion: [] of Hash(String, String)}
+
     property name : String
     property value : U
     property required : Bool
@@ -13,7 +15,15 @@ module Flow::Prop
     property inclusion : (Array(Hash(String, String)) | Array(String)) = [] of Hash(String, String)
     property exclusion : (Array(Hash(String, String)) | Array(String)) = [] of Hash(String, String)
 
-    def initialize(@name, @value, @required = false, @max_length = 0, @min_length = 0, @max_value = 0, @min_value = 0, @size = 0, @inclusion = [] of Hash(String, String), @exclusion = [] of Hash(String, String))
+    def initialize(@name, @value, options = DEFAULT_PARAMS)
+      @required = options.fetch(:required, false).as(Bool)
+      @max_length = options.fetch(:max_length, 0).as(Int32)
+      @min_length = options.fetch(:min_length, 0).as(Int32)
+      @max_value = options.fetch(:max_value, 0).as(Float64 | Int32)
+      @min_value = options.fetch(:min_value, 0).as(Float64 | Int32)
+      @size = options.fetch(:size, 0).as(Int32)
+      @inclusion = options.fetch(:inclusion, [] of Hash(String, String)).as((Array(Hash(String, String)) | Array(String)))
+      @exclusion = options.fetch(:exclusion, [] of Hash(String, String)).as((Array(Hash(String, String)) | Array(String)))
     end
 
     def errors

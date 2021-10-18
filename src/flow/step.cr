@@ -40,7 +40,7 @@ module Flow
 
     def self.validate_property(prop, value, options)
       return true if options.nil?
-      validator = Flow::Prop::Validator(typeof(value)).new(**options.merge({name: prop, value: value}))
+      validator = Flow::Prop::Validator(typeof(value)).new(name: prop, value: value, options: options)
       validator.validate!
     end
 
