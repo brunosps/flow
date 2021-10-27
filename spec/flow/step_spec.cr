@@ -1,4 +1,4 @@
-require "./spec_helper"
+require "../spec_helper"
 
 describe Flow::Step do
   describe "Flow::Step.call" do
@@ -107,5 +107,29 @@ describe Flow::Step do
     it "check result type" do
       (step1.call).is_a?(Flow::Result).should be_true
     end
+  end
+
+  describe "complex test with objects and result#then" do
+    it "valid data" do
+      input = {"name" => "Bruno", "email" => "bruno@bruno.com"}
+      result = ValidateEmailStep.call(input)
+        .then(CreateUserStep)
+        .then(SerializeUserStep)
+        .then(SendMailStep)
+
+      result.success?.should be_true
+      result.data.has_key?("user").should be_true
+    end
+
+    # it "invalid data" do
+    #   input = {"name" => "Bruno", "email" => "brunobruno.com"}
+    #   result = ValidateEmailStep.call(input)
+    #     .then(CreateUserStep)
+    #     .then(SerializeUserStep)
+    #     .then(SendMailStep)
+    #   result.success?.should be_false
+    #   result.data.has_key?("errors").should be_true
+    #   result.data["errors"].as(Hash).["message"].should eq("Email is not valid!")
+    # end
   end
 end

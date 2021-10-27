@@ -1,4 +1,4 @@
-require "./spec_helper"
+require "../../spec_helper"
 
 describe Flow::Prop::Error do
   describe "#initialize" do

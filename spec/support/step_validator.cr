@@ -33,6 +33,6 @@ class StepValidator < Flow::Step
   property exclusion_prop_str : String?
 
   def call : Flow::Result
-    Flow::Result.new(true, {"one" => one, "two" => two}, "ok")
+    Flow::Result.new(true, {"validator" => true}, "ok")
   end
 end

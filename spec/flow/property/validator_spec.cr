@@ -1,4 +1,4 @@
-require "./spec_helper"
+require "../../spec_helper"
 
 describe Flow::Prop::Validator do
   input = {

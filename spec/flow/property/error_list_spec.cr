@@ -1,4 +1,4 @@
-require "./spec_helper"
+require "../../spec_helper"
 
 describe Flow::Prop::ErrorList do
   it "#add with message" do

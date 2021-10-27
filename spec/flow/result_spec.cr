@@ -1,4 +1,4 @@
-require "./spec_helper"
+require "../spec_helper"
 
 describe Flow::Result do
   input = {"one" => 1, "two" => 2}
