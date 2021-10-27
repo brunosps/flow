@@ -1,5 +1,13 @@
+require "./step/failure"
+require "./step/success"
+
 module Flow
   abstract class Step
+    macro inherited
+      include Flow::Failure
+      include Flow::Success
+    end
+
     def []=(variable : String, value)
       {% for ivar in @type.instance_vars %}
         if {{ivar.name.stringify}} == variable
@@ -65,7 +73,7 @@ module Flow
         "type"    => "Flow::FailureException",
         "message" => ex.message.not_nil!,
       }}
-      Flow::Result(typeof(data)).new(false, data, ex.failure_type)
+      Flow::Result(typeof(data)).new(false, data.as(Hash), ex.failure_type)
     rescue ex : Exception
       data = {"errors" => {"type" => "Exception", "message" => ex.message.not_nil!}}
       Flow::Result(typeof(data)).new(false, data, "exception")
