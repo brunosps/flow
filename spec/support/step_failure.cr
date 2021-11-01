@@ -8,6 +8,6 @@ class StepFailure < Flow::Step
   def call : Flow::Result
     result = (one.not_nil! / two.not_nil!).to_i
 
-    Flow::Result.new(false, {"division_product" => result}, "error")
+    failure("error", {"division_product" => result})
   end
 end

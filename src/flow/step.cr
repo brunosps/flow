@@ -56,27 +56,36 @@ module Flow
     end
 
     private def self.do_perform(input : Hash) : Flow::Result
-      step_instance = from_hash(input)
-      step_instance.valid!
-      result = step_instance.call
-      result.merge_data(input)
-    rescue ex : Flow::ValidationException
-      data = {"errors" => {
-        "data"    => ex.data,
-        "type"    => "Flow::ValidationException",
-        "message" => ex.message.not_nil!,
-      }}
-      Flow::Result(typeof(data)).new(false, data, "invalid_attributes")
-    rescue ex : Flow::FailureException
-      data = {"errors" => {
-        "data"    => ex.data,
-        "type"    => "Flow::FailureException",
-        "message" => ex.message.not_nil!,
-      }}
-      Flow::Result(typeof(data)).new(false, data.as(Hash), ex.failure_type)
-    rescue ex : Exception
-      data = {"errors" => {"type" => "Exception", "message" => ex.message.not_nil!}}
-      Flow::Result(typeof(data)).new(false, data, "exception")
+      begin
+        step_instance = from_hash(input)
+        step_instance.valid!
+        result = step_instance.call
+        result.merge_data(input)
+        is_success = result.is_success
+        data = result.data
+        result_type = result.result_type
+      rescue ex : Flow::ValidationException
+        is_success = false
+        data = {"errors" => {
+          "data"    => ex.data,
+          "type"    => "Flow::ValidationException",
+          "message" => ex.message.not_nil!,
+        }}
+        result_type = "invalid_attributes"
+      rescue ex : Flow::FailureException
+        is_success = false
+        data = {"errors" => {
+          "data"    => ex.data,
+          "type"    => "Flow::FailureException",
+          "message" => ex.message.not_nil!,
+        }}
+        result_type = ex.failure_type
+      rescue ex : Exception
+        is_success = false
+        data = {"errors" => {"type" => "Exception", "message" => ex.message.not_nil!}}
+        result_type = "exception"
+      end
+      Flow::Result(typeof(data)).new(is_success, data, result_type)
     end
 
     private def self.properties

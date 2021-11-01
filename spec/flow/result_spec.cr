@@ -11,7 +11,7 @@ describe Flow::Result do
     end
 
     it "new failure object" do
-      result = Flow::Result.new(false, input, "error")
+      result = Flow::Result(typeof(input)).new(false, input, "error")
       result.is_success.should be_false
       result.data.should eq(input)
       result.result_type.should eq("error")
