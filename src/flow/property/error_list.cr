@@ -42,6 +42,14 @@ module Flow::Prop
       end
     end
 
+    def get_errors
+      error_hash = Hash(String, String).new
+      @errors.map do |err|
+        error_hash[err.name] = messages(err.name).join(", ")
+      end
+      error_hash
+    end
+
     def size
       @errors.size
     end

@@ -1,10 +1,8 @@
 module Flow
-  class ValidationException < Exception
-    def initialize(@message : String, @data : Hash(String, Array(String)))
-    end
+  class ValidationException(U) < Exception
+    property data : U
 
-    def data
-      @data
+    def initialize(@message : String, @data : U)
     end
   end
 end

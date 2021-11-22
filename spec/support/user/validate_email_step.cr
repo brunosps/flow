@@ -6,6 +6,7 @@ class ValidateEmailStep < Flow::Step
     email_object = Email.new(email)
 
     return failure("invalid_email", "Email is not valid!") if !email_object.valid?
+
     success({"email" => email_object})
   end
 end

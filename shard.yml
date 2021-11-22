@@ -14,3 +14,6 @@ development_dependencies:
     version: ~> 0.13.0
   watch:
     github: danreeves/watch
+  coverage:
+    github: lbguilherme/crystal-coverage
+    branch: master

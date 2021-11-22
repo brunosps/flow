@@ -7,13 +7,14 @@ class StepException < Flow::Step
 
   def call : Flow::Result
     data = {"error" => {"object" => "failure"}}
-    raise Flow::FailureException.new("failure_flow", "turn off exceptions", JSON.parse(data.to_json)) if exception
+
+    return failure("failure_flow", "turn off exceptions", data) if exception
 
     data = {"success" => {"object" => "success"}}
-    Flow::Result.new(false, data, "error")
+    success(data)
   end
 
-  def valid!
-    raise Flow::ValidationException.new("title can't be blank", {"title" => ["message array"]}) if title.empty?
+  def step_validation
+    errors.add("title", "title cant be blank") if title.empty?
   end
 end

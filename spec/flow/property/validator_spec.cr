@@ -99,6 +99,14 @@ describe Flow::Prop::Validator do
       validator.valid?.should be_false
       validator.errors.messages("attr").includes?("is reserved [BSB,CGH]").should be_true
     end
+
+    it "raises error on invalid check" do
+      validator = Flow::Prop::Validator(String).new(**input.merge({value: "BS1"}), options: {size: 3, inclusion: [{"BSB" => "Brasília"}, {"CGH" => "Congonhas"}]})
+
+      expect_raises(Exception) do
+        validator.validate!
+      end
+    end
   end
 
   describe "Validates Bool" do

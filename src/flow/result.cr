@@ -1,5 +1,3 @@
-require "./result/callback"
-
 module Flow
   class Result(H)
     getter is_success : Bool
@@ -11,8 +9,7 @@ module Flow
     end
 
     def merge_data(input : Hash)
-      # params = input.merge(self.data)
-      params = input
+      params = Flow::Utils::MergeParams.new(self.data.as(Hash)).merge(input)
       Flow::Result(typeof(params)).new(self.is_success, params, self.result_type)
     end
 
@@ -35,7 +32,27 @@ module Flow
     end
 
     def on_failure(&block : Flow::Result(H) -> U) : (Flow::Result) forall U
-      block.call(self) if self.failure? && !self.returned?
+      block.call(self) if self.failure? && !self.returned? && self.result_type != "exception"
+      self
+    end
+
+    def on_failure(result_type_sym : String, &block : Flow::Result(H) -> U) : (Flow::Result) forall U
+      on_failure(&block) if self.result_type == result_type_sym
+      self
+    end
+
+    def on_failure(result_types : Array(String), &block : Flow::Result(H) -> U) : (Flow::Result) forall U
+      on_failure(&block) if result_types.find { |res| res === self.result_type }
+      self
+    end
+
+    def on_failure(*result_types, &block : Flow::Result(H) -> U) : (Flow::Result) forall U
+      on_failure(&block) if result_types.find { |res| res === self.result_type }
+      self
+    end
+
+    def on_exception(&block : Flow::Result(H) -> U) : (Flow::Result) forall U
+      block.call(self) if self.failure? && self.result_type == "exception" && !self.returned?
       self
     end
 
@@ -44,7 +61,6 @@ module Flow
       self
     end
 
-    # include Flow::Callback(H)
     include Flow::Response::Helpers
   end
 end

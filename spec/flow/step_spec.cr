@@ -18,9 +18,12 @@ describe Flow::Step do
 
       it "when failure" do
         result = StepFailure.call(input)
+
         result.is_a?(Flow::Result).should be_true
         result.data.has_key?("one").should be_true
-        result.data.has_key?("division_product").should be_true
+
+        result.data.has_key?("errors").should be_true
+        result.data["errors"].as(Hash).has_key?("division_product").should be_true
         result.result_type.should eq("error")
       end
     end
@@ -41,37 +44,10 @@ describe Flow::Step do
         result.is_a?(Flow::Result).should be_true
         result.is_success.should be_false
         result.data.has_key?("one").should be_true
-        result.data.has_key?("division_product").should be_true
+        result.data.has_key?("errors").should be_true
+        result.data["errors"].as(Hash).has_key?("division_product").should be_true
+
         result.result_type.should eq("error")
-      end
-    end
-
-    describe "test exceptions" do
-      it "Flow::ValidationException" do
-        # expect_raises(Flow::ValidationException) do
-        #   StepException.call({"title" => ""})
-        # end
-        result = StepException.call({"title" => ""})
-        result.is_success.should be_false
-        result.result_type.should eq("invalid_attributes")
-        result.data.has_key?("errors").should be_true
-      end
-
-      it "Flow::FailureException" do
-        #   expect_raises(Flow::FailureException) do
-        #   end
-        result = StepException.call({"title" => "Title", "exception" => true})
-        result.is_success.should be_false
-        result.result_type.should eq("failure_flow")
-        result.data.has_key?("errors").should be_true
-      end
-
-      it "Flow::Exception" do
-        #   expect_raises(Flow::FailureException) do
-        #   end
-        result = StepFailure.call({"one" => 4, "two" => 0})
-        result.is_success.should be_false
-        result.result_type.should eq("exception")
       end
     end
   end
@@ -121,15 +97,28 @@ describe Flow::Step do
       result.data.has_key?("user").should be_true
     end
 
-    # it "invalid data" do
-    #   input = {"name" => "Bruno", "email" => "brunobruno.com"}
-    #   result = ValidateEmailStep.call(input)
-    #     .then(CreateUserStep)
-    #     .then(SerializeUserStep)
-    #     .then(SendMailStep)
-    #   result.success?.should be_false
-    #   result.data.has_key?("errors").should be_true
-    #   result.data["errors"].as(Hash).["message"].should eq("Email is not valid!")
-    # end
+    it "invalid data" do
+      input = {"name" => "Bruno", "email" => "brunobruno.com"}
+      result = ValidateEmailStep.call(input)
+        .then(CreateUserStep)
+        .then(SerializeUserStep)
+        .then(SendMailStep)
+      result.success?.should be_false
+      result.data.has_key?("errors").should be_true
+      result.data.dig("errors", "message").should eq("Email is not valid!")
+    end
+
+    it "invalid property" do
+      input = {"name" => "Bruno", "email" => ""}
+      result = ValidateEmailStep.call(input)
+        .then(CreateUserStep)
+        .then(SerializeUserStep)
+        .then(SendMailStep)
+
+      result.success?.should be_false
+      result.result_type.should eq("invalid_step")
+      result.data.has_key?("errors").should be_true
+      result.data.dig("errors", "email").should eq("is required")
+    end
   end
 end

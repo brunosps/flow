@@ -26,7 +26,7 @@ describe Flow::Result do
 
     it "with no merges data" do
       result = StepSuccess.call(input).then(StepValidator)
-      result.data.has_key?("one").should be_true
+      result.data.has_key?("validator").should be_true
       result.data.has_key?("user").should be_false
     end
   end
