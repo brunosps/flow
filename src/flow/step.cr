@@ -8,8 +8,10 @@ module Flow
       include Flow::Success
     end
 
-    def errors
-      @errors ||= Flow::Prop::ErrorList.new
+    property errors : Flow::Prop::ErrorList
+
+    def initialize
+      @errors = Flow::Prop::ErrorList.new
     end
 
     def []=(variable : String, value)
@@ -55,7 +57,7 @@ module Flow
       return true if options.nil?
       validator = Flow::Prop::Validator(typeof(value)).new(name: prop, value: value, options: options)
       is_valid = validator.valid?
-      @errors = errors + validator.errors unless is_valid
+      @errors = @errors + validator.errors unless is_valid
       is_valid
     end
 
@@ -64,7 +66,7 @@ module Flow
 
     def valid? : Bool
       step_validation
-      errors.size == 0
+      @errors.size == 0
     end
 
     private def self.do_perform(input : Hash) : Flow::Result
@@ -78,24 +80,28 @@ module Flow
         else
           is_success = false
           result_type = "invalid_step"
-          data = {"errors" => step_instance.errors.get_errors}.merge(input)
+          data = input.merge({"errors" => step_instance.errors.get_errors})
         end
       rescue ex
         is_success = false
         result_type = "exception"
-        data = {"errors" => ex.message, "step_class" => self.to_s}.merge(input)
+        data = input.merge({"errors" => ex.message, "step_class" => self.to_s})
       end
       Flow::Result(typeof(data)).new(is_success, data, result_type)
     end
 
     private def self.properties
       {% begin %}
-        {% if @type.instance.instance_vars.size > 0 %}
+        {%
+          has_flow_properties = @type.instance.instance_vars.select { |v| v.stringify != "errors" && v.annotation(Flow::Property) }.size
+        %}
+
+        {% if has_flow_properties > 0 %}
           props = {{ @type.instance_vars
                        .select { |ivar| ivar.annotation(Flow::Property) }
                        .map { |prop| {prop.stringify => prop.annotation(Flow::Property).named_args.empty? ? nil : prop.annotation(Flow::Property).named_args} } }}
         {% else %}
-          props = [] of String
+          props = [] of Hash(String, Hash(String, String))
         {% end %}
       {% end %}
     end

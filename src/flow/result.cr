@@ -1,8 +1,8 @@
 module Flow
   class Result(H)
-    getter is_success : Bool
-    getter data : H
-    getter result_type : String
+    property is_success : Bool
+    property data : H
+    property result_type : String
 
     def initialize(@is_success : Bool, @data : H, @result_type : String)
       @response = Flow::Response.new
