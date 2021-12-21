@@ -19,8 +19,8 @@ module Flow
         if {{ivar.name.stringify}} == variable
           if value.is_a?({{ ivar.type.id }})
             @{{ivar}} = value
-          elsif value.is_a?(JSON::Any)
-            @{{ivar}} = Flow::Utils::JSON.extract_json(value, {{ ivar.type.id }})
+          # elsif value.is_a?(JSON::Any)
+          #   @{{ivar}} = Flow::Utils::JSON.extract_json(value, {{ ivar.type.id }})
           else
             raise "Invalid type #{value.class}"
           end
