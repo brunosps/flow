@@ -53,7 +53,7 @@ module Flow
         value.as_s
       end
 
-      def extract_json(value : ::JSON::Any, type : (U | Nil).class) forall U
+      def self.extract_json(value : ::JSON::Any, type : (U | Nil).class) forall U
         JSON.parse(value.to_json)
       end
     end
