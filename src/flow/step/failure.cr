@@ -11,7 +11,7 @@ module Flow
     end
 
     def failure(failure_type : String, message : String)
-      data = {} of String => String
+      data = {} of String => Hash(String, String)
       failure(failure_type, message, data)
     end
 
@@ -22,7 +22,7 @@ module Flow
 
     def failure(message : String)
       failure_type = "error"
-      data = {} of String => String
+      data = {} of String => Hash(String, String)
       failure(failure_type, message, data)
     end
   end

@@ -1,7 +1,7 @@
 module Flow
   module Success
     def success
-      data = {} of String => Bool
+      data = {} of String => Hash(String, String)
       success(data)
     end
 
